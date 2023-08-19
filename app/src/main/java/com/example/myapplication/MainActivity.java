@@ -1,7 +1,12 @@
 package com.example.myapplication;
 
+import android.app.DatePickerDialog;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -49,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         // - Find and assign the Button that will move to the previous month when clicked
         // - Find and assign the Button that will move to the next month when clicked
         currentMonthTextView = findViewById(R.id.currentMonthTextView);
+        currentMonthTextView.setOnClickListener(v -> showDatePickerDialog());
         calendarGridView = findViewById(R.id.calendarGridView);
         Button prevMonthButton = findViewById(R.id.prevMonthButton);
         Button nextMonthButton = findViewById(R.id.nextMonthButton);
@@ -112,5 +118,39 @@ public class MainActivity extends AppCompatActivity {
 
         // Set the GridView's adapter with the list of dates
         calendarGridView.setAdapter(new CalendarAdapter(this, dates));
+    }
+
+    /**
+     * @author Satoaki Ishihara
+     * This is the method to let users choose the month and year for the calendar they want to check.
+     */
+    private void showDatePickerDialog() {
+        final Calendar c = currentCalendar;
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year1, month1, dayOfMonth) -> {
+            currentCalendar.set(Calendar.YEAR, year1);
+            currentCalendar.set(Calendar.MONTH, month1);
+            loadMonth();
+        }, year, month, 1);
+
+        DatePicker datePicker = datePickerDialog.getDatePicker();
+
+        // Set the minimum date to January 1, 1900
+        Calendar minDate = Calendar.getInstance();
+        minDate.set(1900, 0, 1); // Month is 0-based
+        datePicker.setMinDate(minDate.getTimeInMillis());
+
+        // Set the maximum date to December 31, 2050
+        Calendar maxDate = Calendar.getInstance();
+        maxDate.set(2050, 11, 31); // Month is 0-based
+        datePicker.setMaxDate(maxDate.getTimeInMillis());
+
+        View dayPicker = ((ViewGroup) datePickerDialog.getDatePicker()).findViewById(Resources.getSystem().getIdentifier("day", "id", "android"));
+        if(dayPicker != null) {
+            dayPicker.setVisibility(View.GONE);
+        }
+        datePickerDialog.show();
     }
 }
