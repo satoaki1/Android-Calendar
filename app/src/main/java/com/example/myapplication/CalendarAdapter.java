@@ -1,25 +1,72 @@
 package com.example.myapplication;
 
 import android.content.Context;
-import android.view.LayoutInflater;
+import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class CalendarAdapter extends BaseAdapter {
     private final List<Date> dates;
     private final Context context;
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd", Locale.getDefault());
+    private final Calendar currentMonthDate;
+//    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd", Locale.getDefault());
 
     public CalendarAdapter(Context context, List<Date> dates) {
         this.context = context;
         this.dates = dates;
+        this.currentMonthDate = Calendar.getInstance();
+        this.currentMonthDate.set(LocalDate.now().getYear(), getMonth(LocalDate.now().getMonth()), LocalDate.now().getDayOfMonth());
+    }
+
+    public int getMonth(Month currentMonth) {
+        int month = 0;
+        switch (currentMonth) {
+            case JANUARY:
+                month = Calendar.JANUARY;
+                break;
+            case FEBRUARY:
+                month = Calendar.FEBRUARY;
+                break;
+            case MARCH:
+                month = Calendar.MARCH;
+                break;
+            case APRIL:
+                month = Calendar.APRIL;
+                break;
+            case MAY:
+                month = Calendar.MAY;
+                break;
+            case JUNE:
+                month = Calendar.JUNE;
+                break;
+            case JULY:
+                month = Calendar.JULY;
+                break;
+            case AUGUST:
+                month = Calendar.AUGUST;
+                break;
+            case SEPTEMBER:
+                month = Calendar.SEPTEMBER;
+                break;
+            case OCTOBER:
+                month = Calendar.OCTOBER;
+                break;
+            case NOVEMBER:
+                month = Calendar.NOVEMBER;
+                break;
+            case DECEMBER:
+                month = Calendar.DECEMBER;
+                break;
+        }
+        return month;
     }
 
     @Override
@@ -39,14 +86,42 @@ public class CalendarAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_1, parent, false);
+        TextView dayView = (TextView) convertView;
+        if (dayView == null) {
+            dayView = new TextView(context);
         }
 
-        TextView day = convertView.findViewById(android.R.id.text1);
-        Date date = dates.get(position);
-        day.setText(dateFormat.format(date));
+        Date date = (Date) getItem(position);
+        Calendar dayDate = Calendar.getInstance();
+        dayDate.setTime(date);
 
-        return convertView;
+        // Set day number as text
+        int dayNumber = dayDate.get(Calendar.DAY_OF_MONTH);
+        dayView.setText(String.valueOf(dayNumber));
+
+        customizeDayView(dayView, dayDate);
+
+        return dayView;
+    }
+
+    public void customizeDayView(View dayView, Calendar dayDate) {
+        int dayOfWeek = dayDate.get(Calendar.DAY_OF_WEEK);
+
+        // Check if day is Saturday or Sunday first
+        if (dayOfWeek == Calendar.SATURDAY) {
+            dayView.setBackgroundColor(Color.BLUE);
+            return; // exit the method after setting the color
+        } else if (dayOfWeek == Calendar.SUNDAY) {
+            dayView.setBackgroundColor(Color.RED);
+            return; // exit the method after setting the color
+        }
+
+        // Check if day is from previous, current, or next month
+        if (dayDate.get(Calendar.MONTH) < currentMonthDate.get(Calendar.MONTH) ||
+                dayDate.get(Calendar.MONTH) > currentMonthDate.get(Calendar.MONTH)) {
+            dayView.setBackgroundColor(Color.GRAY);
+        } else {
+            dayView.setBackgroundColor(Color.WHITE);
+        }
     }
 }
