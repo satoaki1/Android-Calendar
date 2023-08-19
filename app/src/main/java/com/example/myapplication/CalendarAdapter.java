@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import com.github.usingsky.calendar.KoreanLunarCalendar;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
@@ -112,9 +114,15 @@ public class CalendarAdapter extends BaseAdapter {
         Calendar dayDate = Calendar.getInstance();
         dayDate.setTime(date);
 
-        // Get the day number from the date (e.g., 1, 2, 3,...31) and set it to the TextView
+        // Get the Lunar Date
+        KoreanLunarCalendar lunarCalendar = KoreanLunarCalendar.getInstance();
+        lunarCalendar.setSolarDate(dayDate.get(Calendar.YEAR), dayDate.get(Calendar.MONTH) + 1, dayDate.get(Calendar.DAY_OF_MONTH));
+
+        // Set day number as text (both Gregorian and Lunar)
         int dayNumber = dayDate.get(Calendar.DAY_OF_MONTH);
-        dayView.setText(String.valueOf(dayNumber));
+        String lunarMonth = String.valueOf(lunarCalendar.getLunarMonth());  // Get the lunar month
+        String lunarDay = String.valueOf(lunarCalendar.getLunarDay());  // Get the lunar day
+        dayView.setText(dayNumber + "\n(" + lunarMonth + "/" + lunarDay + ")");  // This will display the date
 
         // Customize the appearance of the TextView based on the date
         customizeDayView(dayView, dayDate);
